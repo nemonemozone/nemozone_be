@@ -12,6 +12,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginInterceptor())
                 .addPathPatterns("/**")
-                .excludePathPatterns("/login/kakao", "/login/kakao/callback");
+                .excludePathPatterns("/login/kakao", "/login/kakao/callback", "/api-docs/**", "/swagger-ui/**");
     }
 }

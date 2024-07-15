@@ -15,16 +15,16 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("springdoc-openapi")
-                        .version("1.0")
-                        .description("springdoc-openapi swagger-ui"));
+                        .title("nemozone-api")
+                        .version("0.1")
+                        .description("nemozone-api swagger-ui"));
     }
 
     @Bean
     public GroupedOpenApi api() {
         String[] paths = {"/api/v1/**"};
         String[] packagesToScan = {"Nemozone.Nemozone"};
-        return GroupedOpenApi.builder().group("springdoc-openapi")
+        return GroupedOpenApi.builder().group("nemozone-api")
                 .pathsToMatch(paths)
                 .packagesToScan(packagesToScan)
                 .build();

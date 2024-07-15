@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
-@Tag(name = "User API", description = "User API 입니다")
+@Tag(name = "User API", description = "유저 관련 API")
 @Controller
 public class UserController {
 
@@ -32,7 +32,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/login/kakao")
-    @Tag(name = "Kakao Login API")
+    @Tag(name = "Kakao Login")
     @Operation(summary = "카카오 로그인", description = "카카오 로그인을 합니다.")
     public String kakaoLogin(Model model) {
         String location =
@@ -46,14 +46,13 @@ public class UserController {
     }
 
     @GetMapping("/login/kakao/callback")
+    @Tag(name = "Kakao Login Callback")
+    @Operation(summary = "카카오 로그인 콜백", description = "사용자가 로그인 정보 입력 후 카카오 서버에서 로그인 코드를 담아 콜백")
     public ResponseEntity<?> KakaoLoginCallback(@RequestParam("code") String code, HttpServletRequest request) {
         String accessToken = userService.getAccessTokenFromKakao(code);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(accessToken);
 
         userService.kakaoLogin(userInfo);
-
-        Long kakaoUserId = userInfo.id;
-        String nickname = userInfo.kakaoAccount.profile.nickName;
 
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, userInfo);
@@ -64,6 +63,8 @@ public class UserController {
     }
 
     @GetMapping("/logout")
+    @Tag(name = "Logout")
+    @Operation(summary = "로그아웃", description = "세션에서 사용자 정보를 제거하여 로그아웃")
     public String logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
         session.invalidate();
@@ -71,6 +72,8 @@ public class UserController {
     }
 
     @GetMapping("/login-check")
+    @Tag(name = "Login Check")
+    @Operation(summary = "로그인 체크", description = "로그인이 정상적으로 되었다면 OK 출력")
     public ResponseEntity<?> loginCheck() {
         return ResponseEntity
                 .status(HttpStatus.OK)
