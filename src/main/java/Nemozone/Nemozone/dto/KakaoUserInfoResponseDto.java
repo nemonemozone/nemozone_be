@@ -1,5 +1,6 @@
 package Nemozone.Nemozone.dto;
 
+import Nemozone.Nemozone.entity.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
@@ -16,15 +17,6 @@ public class KakaoUserInfoResponseDto {
     @JsonProperty("id")
     public Long id;
 
-    @JsonProperty("has_signed_up")
-    public Boolean hasSignedUp;
-
-    @JsonProperty("connected_at")
-    public Date connectedAt;
-
-    @JsonProperty("synched_at")
-    public Date synchedAt;
-
     @JsonProperty("properties")
     public HashMap<String, String> properties;
 
@@ -36,15 +28,8 @@ public class KakaoUserInfoResponseDto {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public class KakaoAccount {
 
-        @JsonProperty("profile_needs_agreement")
-        public Boolean isProfileAgree;
-
-        @JsonProperty("profile_nickname_needs_agreement")
-        public Boolean isNickNameAgree;
-
         @JsonProperty("profile")
         public Profile profile;
-
 
         @Getter
         @NoArgsConstructor
@@ -57,5 +42,4 @@ public class KakaoUserInfoResponseDto {
 
         }
     }
-
 }

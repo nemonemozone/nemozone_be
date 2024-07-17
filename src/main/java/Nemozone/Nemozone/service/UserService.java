@@ -3,9 +3,13 @@ package Nemozone.Nemozone.service;
 import Nemozone.Nemozone.dto.KakaoTokenResponseDto;
 import Nemozone.Nemozone.dto.KakaoUserInfoResponseDto;
 import Nemozone.Nemozone.dto.KakaoUserJoinDto;
+import Nemozone.Nemozone.dto.UserJoinDto;
 import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.repository.UserRepository;
+import Nemozone.Nemozone.session.SessionConst;
 import io.netty.handler.codec.http.HttpHeaderValues;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +22,18 @@ import org.springframework.http.HttpStatusCode;
 import reactor.core.publisher.Mono;
 
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
 public class UserService {
-    private String clientId;
+    private final String clientId;
     private final UserRepository userRepository;
     private final String KAUTH_TOKEN_URL_HOST = "https://kauth.kakao.com";
     private final String KAUTH_USER_URL_HOST = "https://kapi.kakao.com";
+
+    private static final Integer RANDOM_BOUND = 1000000;
+    private static final ThreadLocalRandom random = ThreadLocalRandom.current();
 
     @Autowired
     public UserService(@Value("${kakao.client-id}") String clientId, UserRepository userRepository) {
@@ -82,17 +90,68 @@ public class UserService {
         return userInfo;
     }
 
-    public void kakaoLogin(KakaoUserInfoResponseDto userInfo) {
+    public void kakaoLogin(KakaoUserInfoResponseDto userInfo, HttpSession session, String kakaoAccessToken) {
         Long kakaoUserId = userInfo.id;
         String nickname = userInfo.kakaoAccount.profile.nickName;
 
-        Optional<User> user = userRepository.findByKakaoId(kakaoUserId);
+        Optional<User> optionalUser = userRepository.findByKakaoId(kakaoUserId);
 
-        if (user.isEmpty()) {
+        if (optionalUser.isEmpty()) {
             KakaoUserJoinDto kakaoUserJoinDto = new KakaoUserJoinDto(userInfo);
             userRepository.save(kakaoUserJoinDto.toEntity());
+            optionalUser = userRepository.findByKakaoId(kakaoUserId);
         }
 
+        User user = optionalUser.get();
 
+//        if (user.getNickname() == null || user.getRelation() == null) {
+//            userRepository.delete(user);
+//            KakaoUserJoinDto kakaoUserJoinDto = new KakaoUserJoinDto(userInfo);
+//            userRepository.save(kakaoUserJoinDto.toEntity());
+//        }
+
+        session.setAttribute(SessionConst.LOGIN_MEMBER, userInfo);
+        session.setAttribute(SessionConst.KAKAO_ACCESS_TOKEN, kakaoAccessToken);
+    }
+
+    public void join(UserJoinDto userJoinDto) {
+        userRepository.save(userJoinDto.toEntity());
+    }
+
+    public Optional<User> getUserByKakaoId(Long kakaoId) {
+        return userRepository.findByKakaoId(kakaoId);
+    }
+
+    public void logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+
+        WebClient.create(KAUTH_TOKEN_URL_HOST).post()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("https")
+                        .path("/v1/user/logout")
+                        .build(true))
+                .header("Authorization", (String) session.getAttribute(SessionConst.KAKAO_ACCESS_TOKEN))
+                .retrieve()
+                //TODO : Custom Exception
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
+                .bodyToMono(KakaoTokenResponseDto.class)
+                .block();
+
+        session.invalidate();
+    }
+
+    public Long makeNewConnectId() {
+        Long newConnectId;
+        Optional<User> userOptional;
+        do {
+            newConnectId = random.nextLong(RANDOM_BOUND);
+            userOptional = userRepository.findUserByRelationConnectId(newConnectId);
+        } while (userOptional.isPresent());
+        return newConnectId;
+    }
+
+    public Optional<User> getUserByConnectId(Long partnerConnectId) {
+        return userRepository.findUserByRelationConnectId(partnerConnectId);
     }
 }

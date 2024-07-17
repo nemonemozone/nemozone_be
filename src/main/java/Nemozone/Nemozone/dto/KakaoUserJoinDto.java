@@ -7,17 +7,17 @@ import lombok.Getter;
 public class KakaoUserJoinDto {
 
     private Long kakaoId;
-    private String nickname;
+    private String kakaoNickname;
 
     public KakaoUserJoinDto(KakaoUserInfoResponseDto userInfo) {
         this.kakaoId = userInfo.id;
-        this.nickname = userInfo.kakaoAccount.profile.nickName;
+        this.kakaoNickname = userInfo.kakaoAccount.profile.nickName;
     }
 
     public User toEntity() {
         return User.builder()
                 .kakaoId(kakaoId)
-                .nickname(nickname)
+                .kakaoNickname(kakaoNickname)
                 .build();
     }
 }

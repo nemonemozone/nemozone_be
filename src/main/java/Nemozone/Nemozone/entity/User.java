@@ -1,10 +1,7 @@
 package Nemozone.Nemozone.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDate;
@@ -19,27 +16,38 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue
-    private Long id;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "kakao_id", nullable = false, unique = true)
     private Long kakaoId;
 
+    @Column(name = "kakao_nick_name")
+    private String kakaoNickname;
+
+    @Setter
     @Column
     private String nickname;
 
-//    @OneToOne
-//    @JoinColumn(name = "id")
-//    @Column
-//    private User pairUser;
+    @Setter
+    @Column(name = "relation_connect_id", unique = true)
+    private Long relationConnectId;
+
+    @Setter
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "relation_id")
+    private Relation relation;
 
     @CreationTimestamp
-    @Column
-    private LocalDate created_at;
+    @Column(name = "created_at")
+    private LocalDate createdAt;
 
     @Builder
-    public User(Long kakaoId, String nickname) {
+    public User(Long kakaoId, String kakaoNickname, Relation relation, Long relationConnectId) {
         this.kakaoId = kakaoId;
-        this.nickname = nickname;
-        //this.pairUser = pairUser;
+        this.kakaoNickname = kakaoNickname;
+        this.relation = relation;
+        this.relationConnectId = relationConnectId;
     }
+
 }
