@@ -2,10 +2,7 @@ package Nemozone.Nemozone.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -29,14 +26,19 @@ public class Relation {
     @Column(name = "start_date")
     private Date startDate;
 
+    @Setter
+    @Column(name = "next_mission_order")
+    private Integer nextMissionOrder;
+
     public void addUser(User user) {
         users.add(user);
     }
 
     @Builder
-    public Relation(Long id, List<User> users, Date startDate) {
+    public Relation(Long id, List<User> users, Date startDate, Integer nextMissionOrder) {
         this.id = id;
         this.users = users;
         this.startDate = startDate;
+        this.nextMissionOrder = nextMissionOrder;
     }
 }
