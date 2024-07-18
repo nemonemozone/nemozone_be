@@ -8,6 +8,7 @@ import Nemozone.Nemozone.repository.RelationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -60,7 +61,7 @@ public class RelationService {
         startDayCalendar.setTime(startDate);
         nowCalendar.setTime(now);
 
-        Long totalDate = (nowCalendar.getTimeInMillis() - startDayCalendar.getTimeInMillis()) / (1000 * 60 * 60 * 24) + 1;
+        Long totalDate = (nowCalendar.getTimeInMillis() - startDayCalendar.getTimeInMillis()) / (1000 * 60 * 60 * 24L) + 1;
 
         return totalDate;
     }

@@ -77,10 +77,12 @@ public class UserController {
     @GetMapping("/logout")
     @Tag(name = "로그아웃")
     @Operation(summary = "로그아웃", description = "세션에서 사용자 정보를 제거하여 로그아웃")
-    public String logout(HttpServletRequest request) {
+    public ResponseEntity<?> logout(HttpServletRequest request) {
         userService.logout(request);
 
-        return "redirect:/api/login/kakao";
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
     }
 
     @GetMapping("/login-check")
