@@ -2,12 +2,14 @@ package Nemozone.Nemozone.controller;
 
 import Nemozone.Nemozone.dto.KakaoUserInfoResponseDto;
 import Nemozone.Nemozone.dto.UserJoinDto;
+import Nemozone.Nemozone.dto.UserJoinRequestDto;
 import Nemozone.Nemozone.entity.Relation;
 import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.service.RelationService;
 import Nemozone.Nemozone.service.UserService;
 import Nemozone.Nemozone.session.SessionConst;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -17,17 +19,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Tag(name = "User API", description = "유저 관련 API")
+@Tag(name = "User", description = "User API")
 @RequestMapping("/api")
 @Controller
 public class UserController {
@@ -58,6 +57,7 @@ public class UserController {
 
     @GetMapping("/login/kakao/callback")
     @Tag(name = "카카오 로그인 콜백")
+    @ApiResponse(responseCode = "200", description = "성공")
     @Operation(summary = "카카오 로그인 콜백", description = "사용자가 로그인 정보 입력 후 카카오 서버에서 로그인 코드를 담아 콜백")
     public ResponseEntity<User> KakaoLoginCallback(@RequestParam("code") String code, HttpServletRequest request) {
         String accessToken = userService.getAccessTokenFromKakao(code);
@@ -94,19 +94,23 @@ public class UserController {
 
     @PostMapping("/join")
     @Tag(name = "회원가입")
+    @ApiResponse(responseCode = "201", description = "회원가입 성공")
+    @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
+    @ApiResponse(responseCode = "400", description = "이미 회원가입되어 있음")
     @Operation(summary = "회원가입",
             description = "카카오 로그인 결과 json에 null 값이 있다면 회원가입이 되지 않은 것이므로 회원가입 진행")
     public ResponseEntity<?> join(
             HttpServletRequest request,
-            @RequestParam(value = "nickname") String nickname,
-            @RequestParam(value = "startDate") Date relationFirstDate) {
+//            @RequestParam(value = "nickname") String nickname,
+//            @RequestParam(value = "startDate") Date relationFirstDate
+            @RequestBody UserJoinRequestDto userJoinRequestDto ) {
 
         KakaoUserInfoResponseDto userInfoResponseDto = (KakaoUserInfoResponseDto) request.getSession(false).getAttribute(SessionConst.LOGIN_MEMBER);
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfoResponseDto.id);
 
         if (optionalUser.isEmpty())
             return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .status(HttpStatus.NOT_FOUND)
                     .body("user 엔티티가 존재하지 않습니다.");
 
         User user = optionalUser.get();
@@ -118,7 +122,7 @@ public class UserController {
         }
 
         Long newConnectId = userService.makeNewConnectId();
-        UserJoinDto userJoinDto = new UserJoinDto(user, nickname, relationFirstDate, newConnectId);
+        UserJoinDto userJoinDto = new UserJoinDto(user, userJoinRequestDto.nickname(), userJoinRequestDto.startDate(), newConnectId);
 
         userService.join(userJoinDto);
 

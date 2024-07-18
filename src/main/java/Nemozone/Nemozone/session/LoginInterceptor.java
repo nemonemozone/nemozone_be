@@ -12,7 +12,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
         if (userInfo == null) {
             response.setContentType("text/html; charset=utf-8");
-            response.getWriter().println("잘못된 접근입니다.");
+            response.getWriter().println("로그인이 필요합니다.");
             return false;
         } else {
             return true;
