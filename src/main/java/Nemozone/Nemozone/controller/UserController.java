@@ -42,7 +42,7 @@ public class UserController {
     private final RelationService relationService;
 
     @GetMapping("/login/kakao")
-    @Tag(name = "Kakao Login")
+    @Tag(name = "카카오 로그인")
     @Operation(summary = "카카오 로그인", description = "카카오 로그인을 합니다.")
     public String kakaoLogin(Model model) {
         String location =
@@ -57,25 +57,25 @@ public class UserController {
     }
 
     @GetMapping("/login/kakao/callback")
-    @Tag(name = "Kakao Login Callback")
+    @Tag(name = "카카오 로그인 콜백")
     @Operation(summary = "카카오 로그인 콜백", description = "사용자가 로그인 정보 입력 후 카카오 서버에서 로그인 코드를 담아 콜백")
-    public String KakaoLoginCallback(@RequestParam("code") String code, HttpServletRequest request) {
+    public ResponseEntity<User> KakaoLoginCallback(@RequestParam("code") String code, HttpServletRequest request) {
         String accessToken = userService.getAccessTokenFromKakao(code);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(accessToken);
 
         HttpSession session = request.getSession();
 
-        userService.kakaoLogin(userInfo, session, accessToken);
+        User user = userService.kakaoLogin(userInfo, session, accessToken);
 
-//        return ResponseEntity
-//                .status(HttpStatus.OK)
-//                .body("OK");
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(user);
 
-        return "join";
+        //return "join";
     }
 
     @GetMapping("/logout")
-    @Tag(name = "Logout")
+    @Tag(name = "로그아웃")
     @Operation(summary = "로그아웃", description = "세션에서 사용자 정보를 제거하여 로그아웃")
     public String logout(HttpServletRequest request) {
         userService.logout(request);
@@ -84,15 +84,18 @@ public class UserController {
     }
 
     @GetMapping("/login-check")
-    @Tag(name = "Login Check")
+    @Tag(name = "로그인 체크")
     @Operation(summary = "로그인 체크", description = "로그인이 정상적으로 되었다면 OK 출력")
     public ResponseEntity<?> loginCheck() {
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .build();
+                .body("OK");
     }
 
     @PostMapping("/join")
+    @Tag(name = "회원가입")
+    @Operation(summary = "회원가입",
+            description = "카카오 로그인 결과 json에 null 값이 있다면 회원가입이 되지 않은 것이므로 회원가입 진행")
     public ResponseEntity<?> join(
             HttpServletRequest request,
             @RequestParam(value = "nickname") String nickname,

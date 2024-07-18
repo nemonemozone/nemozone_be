@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface MissionRepository extends JpaRepository<Mission, Long> {
 
-    Optional<Mission> findMissionBy
+    Optional<Mission> findMissionByOrder(Long order);
 }

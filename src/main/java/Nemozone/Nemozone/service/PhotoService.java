@@ -2,6 +2,7 @@ package Nemozone.Nemozone.service;
 
 import Nemozone.Nemozone.dto.PhotoSaveRequestDto;
 import Nemozone.Nemozone.entity.Mission;
+import Nemozone.Nemozone.entity.Photo;
 import Nemozone.Nemozone.entity.Relation;
 import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.repository.PhotoRepository;
@@ -31,18 +32,14 @@ public class PhotoService {
     public void savePhoto(MultipartFile multipartFile, HttpSession session, Optional<User> optionalUser) throws IOException {
         String s3Url = savePhoto(multipartFile);
 
-        if (optionalUser.isEmpty()) {
-            // TODO
-            return;
-        }
-
         User user = optionalUser.get();
         Relation relation = user.getRelation();
         Long totalDate = relationService.getTotalDate(user);
-        Optional<Mission> optionalMission = missionService.getTodayMission(totalDate);
-
-        PhotoSaveRequestDto photoSaveRequestDto = new PhotoSaveRequestDto(relation, s3Url, totalDate, );
-
+        Optional<Mission> optionalMission = missionService.getMissionByOrder(relation.getNextMissionOrder());
+        Mission mission = optionalMission.get();
+        PhotoSaveRequestDto photoSaveRequestDto = new PhotoSaveRequestDto(relation, s3Url, totalDate, mission);
+        photoRepository.save(photoSaveRequestDto.toEntity());
+        relation.plusOneNextMissionOrder();
     }
 
     public String savePhoto(MultipartFile multipartFile) throws IOException {

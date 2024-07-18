@@ -28,14 +28,18 @@ public class Relation {
 
     @Setter
     @Column(name = "next_mission_order")
-    private Integer nextMissionOrder;
+    private Long nextMissionOrder;
 
     public void addUser(User user) {
         users.add(user);
     }
 
+    public void plusOneNextMissionOrder() {
+        this.nextMissionOrder++;
+    }
+
     @Builder
-    public Relation(Long id, List<User> users, Date startDate, Integer nextMissionOrder) {
+    public Relation(Long id, List<User> users, Date startDate, Long nextMissionOrder) {
         this.id = id;
         this.users = users;
         this.startDate = startDate;

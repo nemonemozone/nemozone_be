@@ -90,7 +90,7 @@ public class UserService {
         return userInfo;
     }
 
-    public void kakaoLogin(KakaoUserInfoResponseDto userInfo, HttpSession session, String kakaoAccessToken) {
+    public User kakaoLogin(KakaoUserInfoResponseDto userInfo, HttpSession session, String kakaoAccessToken) {
         Long kakaoUserId = userInfo.id;
         String nickname = userInfo.kakaoAccount.profile.nickName;
 
@@ -104,14 +104,10 @@ public class UserService {
 
         User user = optionalUser.get();
 
-//        if (user.getNickname() == null || user.getRelation() == null) {
-//            userRepository.delete(user);
-//            KakaoUserJoinDto kakaoUserJoinDto = new KakaoUserJoinDto(userInfo);
-//            userRepository.save(kakaoUserJoinDto.toEntity());
-//        }
-
         session.setAttribute(SessionConst.LOGIN_MEMBER, userInfo);
         session.setAttribute(SessionConst.KAKAO_ACCESS_TOKEN, kakaoAccessToken);
+
+        return user;
     }
 
     public void join(UserJoinDto userJoinDto) {

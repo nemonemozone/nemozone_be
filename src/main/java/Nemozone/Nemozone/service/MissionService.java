@@ -13,8 +13,9 @@ public class MissionService {
 
     private final MissionRepository missionRepository;
 
-    public Optional<Mission> getMissionByDay(Long day) {
+    public Optional<Mission> getMissionByOrder(Long order) {
 
+        return missionRepository.findMissionByOrder(order);
 
     }
 }

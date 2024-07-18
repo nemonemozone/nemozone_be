@@ -25,7 +25,8 @@ public class Mission {
     @Column(name = "mission_order")
     private Long order;
 
-    @OneToMany(mappedBy = "photo_id")
+    @OneToMany(mappedBy = "mission")
+    @Column
     private List<Photo> photos;
 
     @Builder

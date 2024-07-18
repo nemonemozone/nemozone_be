@@ -41,6 +41,11 @@ public class PhotoController {
         HttpSession session = request.getSession();
         KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
+        if (optionalUser.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .build();
+
         photoService.savePhoto(file, session, optionalUser);
 
         return ResponseEntity

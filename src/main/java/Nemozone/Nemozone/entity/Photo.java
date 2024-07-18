@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-@Table(name = "photo")
+@Table(name = "photo_table")
 public class Photo {
 
     @Id
@@ -18,17 +18,17 @@ public class Photo {
     private Long id;
 
     @ManyToOne
-    @Column(name = "relation_id")
+    @JoinColumn(name = "relation_id")
     private Relation relation;
 
     @Column(name = "image_s3_url")
     private String s3Url;
 
-    @Column
+    @Column(name = "relation_day")
     private Long day;
 
     @ManyToOne
-    @Column
+    @JoinColumn(name = "mission_id")
     private Mission mission;
 
     @Builder
