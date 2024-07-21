@@ -1,5 +1,6 @@
 package Nemozone.Nemozone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,6 +26,7 @@ public class Mission {
     @Column(name = "mission_order")
     private Long order;
 
+    @JsonIgnoreProperties({"mission"})
     @OneToMany(mappedBy = "mission")
     @Column
     private List<Photo> photos;

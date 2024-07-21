@@ -30,6 +30,10 @@ public class Relation {
     @Column(name = "next_mission_order")
     private Long nextMissionOrder;
 
+    @OneToMany(mappedBy = "relation", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @JsonIgnoreProperties({"relation"})
+    private List<Photo> photos;
+
     public void addUser(User user) {
         users.add(user);
     }
@@ -39,10 +43,11 @@ public class Relation {
     }
 
     @Builder
-    public Relation(Long id, List<User> users, Date startDate, Long nextMissionOrder) {
+    public Relation(Long id, List<User> users, Date startDate, Long nextMissionOrder, List<Photo> photos) {
         this.id = id;
         this.users = users;
         this.startDate = startDate;
         this.nextMissionOrder = nextMissionOrder;
+        this.photos = photos;
     }
 }

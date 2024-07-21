@@ -8,6 +8,8 @@ import Nemozone.Nemozone.service.UserService;
 import Nemozone.Nemozone.session.SessionConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.ServletInputStream;
@@ -37,8 +39,15 @@ public class RelationController {
     private final UserService userService;
     private final RelationService relationService;
 
-    @Tag(name = "로그인한 커플의 모든 정보")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "200",
+            description = "조회 성공",
+            content = {
+            @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RelationInfoResponseDto.class)
+            )
+            }
+    )
     @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
     @Operation(summary = "로그인한 커플의 모든 정보 조회", description = "로그인한 유저가 속한 커플의 모든 정보를 조회합니다.")
     @GetMapping("")
@@ -59,9 +68,16 @@ public class RelationController {
                 .body(relationInfo);
     }
 
-    @Tag(name = "커플 연결")
     @Operation(summary = "커플 연결", description = "로그인한 유저가 파트너 연결 ID로 커플 연결")
-    @ApiResponse(responseCode = "200", description = "커플 연결 성공")
+    @ApiResponse(responseCode = "200",
+            description = "커플 연결 성공",
+            content = {
+            @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = RelationSetResponseDto.class)
+            )
+            }
+    )
     @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
     @ApiResponse(responseCode = "400", description = "이미 커플인 유저")
     @PostMapping("")
@@ -104,15 +120,23 @@ public class RelationController {
         }
 
         Relation relation = relationService.setNewRelation(user, partner);
+        RelationSetResponseDto relationSetResponseDto = new RelationSetResponseDto(relation);
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(relation);
+                .body(relationSetResponseDto);
     }
 
-    @Tag(name = "파트너 정보")
     @Operation(summary = "파트너 정보", description = "로그인한 유저의 파트너 정보 조회")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "200",
+            description = "조회 성공",
+            content = {
+            @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = PartnerInfoResponseDto.class)
+            )
+            }
+    )
     @ApiResponse(responseCode = "404", description = "파트너 정보가 존재하지 않음")
     @GetMapping("/partner")
     public ResponseEntity<?> getPartnerInfo(HttpServletRequest request) {
@@ -132,9 +156,16 @@ public class RelationController {
                 .body(partnerInfoResponseDto);
     }
 
-    @Tag(name = "사귄 기간 조회")
     @Operation(summary = "사귄 기간 조회", description = "로그인한 유저가 파트너와 사귄 기간 조회")
-    @ApiResponse(responseCode = "200", description = "조회 성공")
+    @ApiResponse(responseCode = "200",
+            description = "조회 성공",
+            content = {
+            @Content(
+                    mediaType = "application/json",
+                    schema = @Schema(implementation = TotalDateResponseDto.class)
+            )
+            }
+    )
     @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
     @GetMapping("/date")
     public ResponseEntity<?> getRelationTotalDate(HttpServletRequest request) {
@@ -155,7 +186,6 @@ public class RelationController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                //.body(new TotalDateWrapper(totalDate));
                 .body(totalDateResponseDto);
     }
 }

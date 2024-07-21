@@ -2,6 +2,7 @@ package Nemozone.Nemozone.dto;
 
 import Nemozone.Nemozone.entity.Relation;
 import Nemozone.Nemozone.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ public class UserJoinDto {
     private final String nickname;
     private final Date relationStartDate;
     private final Long relationConnectId;
+    @JsonIgnore
     private final Relation relation;
 
     public UserJoinDto(User user, String nickname, Date relationFirstDate, Long relationConnectId) {
@@ -23,9 +25,10 @@ public class UserJoinDto {
         this.relationStartDate = relationFirstDate;
         this.relationConnectId = relationConnectId;
 
-        relation = Relation.builder()
+        this.relation = Relation.builder()
                 .users(Arrays.asList(user))
                 .startDate(relationStartDate)
+                .nextMissionOrder(1L)
                 .build();
     }
 

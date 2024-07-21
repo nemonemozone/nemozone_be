@@ -5,6 +5,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -21,8 +25,11 @@ public class Photo {
     @JoinColumn(name = "relation_id")
     private Relation relation;
 
-    @Column(name = "image_s3_url")
-    private String s3Url;
+    @Column(name = "image_s3_url1")
+    private String s3Url1;
+
+    @Column(name = "image_s3_url2")
+    private String s3Url2;
 
     @Column(name = "relation_day")
     private Long day;
@@ -31,11 +38,16 @@ public class Photo {
     @JoinColumn(name = "mission_id")
     private Mission mission;
 
+    @CreationTimestamp
+    @Column(name = "created_at")
+    private Date createdAt;
+
     @Builder
-    public Photo(Long id, Relation relation, String s3Url, Long day, Mission mission) {
+    public Photo(Long id, Relation relation, String s3Url1, String s3Url2, Long day, Mission mission) {
         this.id = id;
         this.relation = relation;
-        this.s3Url = s3Url;
+        this.s3Url1 = s3Url1;
+        this.s3Url2 = s3Url2;
         this.day = day;
         this.mission = mission;
     }

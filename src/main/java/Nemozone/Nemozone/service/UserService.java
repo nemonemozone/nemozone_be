@@ -110,8 +110,8 @@ public class UserService {
         return user;
     }
 
-    public void join(UserJoinDto userJoinDto) {
-        userRepository.save(userJoinDto.toEntity());
+    public User join(UserJoinDto userJoinDto) {
+        return userRepository.save(userJoinDto.toEntity());
     }
 
     public Optional<User> getUserByKakaoId(Long kakaoId) {

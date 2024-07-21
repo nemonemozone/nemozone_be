@@ -1,6 +1,8 @@
 package Nemozone.Nemozone.service;
 
+import Nemozone.Nemozone.dto.PhotoResponseDto;
 import Nemozone.Nemozone.dto.PhotoSaveRequestDto;
+import Nemozone.Nemozone.dto.PhotoSaveResponseDto;
 import Nemozone.Nemozone.entity.Mission;
 import Nemozone.Nemozone.entity.Photo;
 import Nemozone.Nemozone.entity.Relation;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -24,32 +28,43 @@ public class PhotoService {
     private final RelationService relationService;
     private final MissionService missionService;
     private final PhotoRepository photoRepository;
-    private final AmazonS3 amazonS3;
+    private final UserService userService;
 
-    @Value("${cloud.aws.s3.bucket}")
-    private String bucket;
-
-    public void savePhoto(MultipartFile multipartFile, HttpSession session, Optional<User> optionalUser) throws IOException {
-        String s3Url = savePhoto(multipartFile);
-
+    public List<PhotoResponseDto> getPhotosByKakaoId(Long kakaoId) throws Exception {
+        Optional<User> optionalUser = userService.getUserByKakaoId(kakaoId);
         User user = optionalUser.get();
-        Relation relation = user.getRelation();
-        Long totalDate = relationService.getTotalDate(user);
-        Optional<Mission> optionalMission = missionService.getMissionByOrder(relation.getNextMissionOrder());
-        Mission mission = optionalMission.get();
-        PhotoSaveRequestDto photoSaveRequestDto = new PhotoSaveRequestDto(relation, s3Url, totalDate, mission);
-        photoRepository.save(photoSaveRequestDto.toEntity());
-        relation.plusOneNextMissionOrder();
+        Optional<Relation> optionalRelation = relationService.getRelationByUser(user);
+        if (optionalRelation.isEmpty())
+            throw new Exception();
+        Relation relation = optionalRelation.get();
+        List<Photo> photoByRelation = photoRepository.findPhotoByRelation(relation);
+        List<PhotoResponseDto> responseDtoList = new ArrayList<>();
+        for (Photo photo : photoByRelation) {
+            PhotoResponseDto responseDto = PhotoResponseDto.makeByPhoto(photo);
+            responseDtoList.add(responseDto);
+        }
+        return responseDtoList;
     }
 
-    public String savePhoto(MultipartFile multipartFile) throws IOException {
-        String originalFilename = multipartFile.getOriginalFilename();
+    public PhotoSaveResponseDto savePhoto(PhotoSaveRequestDto requestDto, User user) {
+        Optional<Relation> optionalRelation = relationService.getRelationByUser(user);
+        Relation relation = optionalRelation.get();
+        Long nextMissionOrder = relation.getNextMissionOrder();
+        relation.plusOneNextMissionOrder();
 
-        ObjectMetadata metadata = new ObjectMetadata();
-        metadata.setContentLength(multipartFile.getSize());
-        metadata.setContentType(multipartFile.getContentType());
+        Optional<Mission> optionalMission = missionService.getMissionByOrder(nextMissionOrder);
+        Mission mission = optionalMission.get();
 
-        amazonS3.putObject(bucket, originalFilename, multipartFile.getInputStream(), metadata);
-        return amazonS3.getUrl(bucket, originalFilename).toString();
+        requestDto.setDay(relationService.getTotalDate(user));
+        requestDto.setRelation(relation);
+        requestDto.setMission(mission);
+
+
+        Photo savePhotoEntity = photoRepository.save(requestDto.toEntity());
+        return new PhotoSaveResponseDto(savePhotoEntity);
+    }
+
+    public Optional<Photo> getPhotoByPhotoId(Long photoId) {
+        return photoRepository.findPhotoById(photoId);
     }
 }
