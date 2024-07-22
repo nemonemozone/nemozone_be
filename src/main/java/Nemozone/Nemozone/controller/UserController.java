@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -78,7 +79,8 @@ public class UserController {
         UserResponseDto userResponseDto = new UserResponseDto(user);
 
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(HttpStatus.MULTIPLE_CHOICES)
+                .location(URI.create("https://www.nemoz.one/auth/kakao"))
                 .body(userResponseDto);
     }
 
