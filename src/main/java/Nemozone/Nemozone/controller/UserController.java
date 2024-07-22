@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -79,7 +80,7 @@ public class UserController {
         UserResponseDto userResponseDto = new UserResponseDto(user);
 
         return ResponseEntity
-                .status(HttpStatus.MULTIPLE_CHOICES)
+                .status(HttpStatus.MOVED_PERMANENTLY)
                 .location(URI.create("https://www.nemoz.one/auth/kakao"))
                 .body(userResponseDto);
     }
