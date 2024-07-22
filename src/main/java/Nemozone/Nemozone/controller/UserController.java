@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Tag(name = "User", description = "User API")
 @RequestMapping("/api")
@@ -79,10 +81,12 @@ public class UserController {
 
         UserResponseDto userResponseDto = new UserResponseDto(user);
 
+        log.info(session.getId());
+
         return ResponseEntity
                 .status(HttpStatus.MOVED_PERMANENTLY)
-                .location(URI.create("https://www.nemoz.one/auth/kakao"))
-                .body(userResponseDto);
+                .location(URI.create("https://www.nemoz.one/auth/kakao?session="+session.getId()))
+                .build();
     }
 
     @GetMapping("/logout")
