@@ -18,7 +18,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         KakaoUserInfoResponseDto userInfo;
         try {
             userInfo = userService.getUserInfo(accessToken);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             response.setContentType("text/html; charset=utf-8");
             response.getWriter().println("로그인이 필요합니다.");
             return false;

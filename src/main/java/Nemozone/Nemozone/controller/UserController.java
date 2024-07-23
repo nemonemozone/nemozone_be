@@ -181,6 +181,10 @@ public class UserController {
         //KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
+        if (optionalUser.isEmpty())
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("user 엔티티가 존재하지 않습니다.");
         User user = optionalUser.get();
         UserResponseDto userResponseDto = new UserResponseDto(user);
         return ResponseEntity
