@@ -9,6 +9,7 @@ import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.service.MissionService;
 import Nemozone.Nemozone.service.RelationService;
 import Nemozone.Nemozone.service.UserService;
+import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.SessionConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -53,8 +54,10 @@ public class MissionController {
     )
     @GetMapping("/next")
     public ResponseEntity<?> getNextMission(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
 
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         User user = optionalUser.get();
@@ -93,8 +96,10 @@ public class MissionController {
     @ApiResponse(responseCode = "400", description = "커플이 아님")
     @GetMapping("")
     public ResponseEntity<?> getAllMission(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         User user = optionalUser.get();
         Optional<Relation> optionalRelation = relationService.getRelationByUser(user);
@@ -123,8 +128,10 @@ public class MissionController {
     @ApiResponse(responseCode = "404", description = "정보가 없음")
     @GetMapping("/{mission_id}")
     public ResponseEntity<?> getMissionById(@PathVariable("mission_id") Long missionId, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         User user = optionalUser.get();
         Optional<Relation> optionalRelation = relationService.getRelationByUser(user);

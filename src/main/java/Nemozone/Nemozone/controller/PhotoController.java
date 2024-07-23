@@ -10,6 +10,7 @@ import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.service.PhotoService;
 import Nemozone.Nemozone.service.RelationService;
 import Nemozone.Nemozone.service.UserService;
+import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.SessionConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -55,8 +56,10 @@ public class PhotoController {
     @ApiResponse(responseCode = "404", description = "조회 실패")
     @GetMapping("")
     public ResponseEntity<?> getAllPhoto(HttpServletRequest request) throws Exception {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
         List<PhotoResponseDto> photoResponseDtos;
         try {
             photoResponseDtos = photoService.getPhotosByKakaoId(userInfo.getId());
@@ -82,8 +85,10 @@ public class PhotoController {
     })
     @PostMapping("")
     public ResponseEntity<?> savePhoto(@RequestBody PhotoSaveRequestDto requestDto, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         PhotoSaveResponseDto responseDto = photoService.savePhoto(requestDto, optionalUser.get());
         return ResponseEntity
@@ -102,8 +107,10 @@ public class PhotoController {
                         schema = @Schema(implementation = PhotoResponseDto.class))})
     @GetMapping("/{photo_id}")
     public ResponseEntity<?> getPhotoById(@PathVariable("photo_id") Long photoId, HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         User user = optionalUser.get();
         Optional<Photo> optionalPhoto = photoService.getPhotoByPhotoId(photoId);

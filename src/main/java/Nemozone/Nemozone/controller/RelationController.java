@@ -5,6 +5,7 @@ import Nemozone.Nemozone.entity.Relation;
 import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.service.RelationService;
 import Nemozone.Nemozone.service.UserService;
+import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.SessionConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -52,7 +53,8 @@ public class RelationController {
     @Operation(summary = "로그인한 커플의 모든 정보 조회", description = "로그인한 유저가 속한 커플의 모든 정보를 조회합니다.")
     @GetMapping("")
     public ResponseEntity<?> getRelationInfo(HttpServletRequest request) {
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
+        //KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
 
         if (optionalUser.isEmpty())
@@ -86,8 +88,9 @@ public class RelationController {
             HttpServletRequest request) {
 
         Long partnerConnectId = relationSetDto.partnerConnectId();
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfoResponseDto = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfoResponseDto = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfoResponseDto = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
         Long userKakaoId = userInfoResponseDto.getId();
         Optional<User> userOptional = userService.getUserByKakaoId(userKakaoId);
 
@@ -141,8 +144,12 @@ public class RelationController {
     @GetMapping("/partner")
     public ResponseEntity<?> getPartnerInfo(HttpServletRequest request) {
 
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+
+
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         User user = optionalUser.get();
         PartnerInfoResponseDto partnerInfoResponseDto = relationService.getPartnerInfo(user);
@@ -169,8 +176,9 @@ public class RelationController {
     @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
     @GetMapping("/date")
     public ResponseEntity<?> getRelationTotalDate(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+//        HttpSession session = request.getSession();
+//        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
 
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
 

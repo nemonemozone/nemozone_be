@@ -8,6 +8,7 @@ import Nemozone.Nemozone.entity.Relation;
 import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.service.RelationService;
 import Nemozone.Nemozone.service.UserService;
+import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.SessionConst;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,21 +72,22 @@ public class UserController {
             }
     )
     @Operation(summary = "카카오 로그인 콜백", description = "사용자가 로그인 정보 입력 후 카카오 서버에서 로그인 코드를 담아 콜백")
-    public ResponseEntity<?> KakaoLoginCallback(@RequestParam("code") String code, HttpServletRequest request) {
-        String accessToken = userService.getAccessTokenFromKakao(code);
+    public ResponseEntity<?> KakaoLoginCallback(HttpServletRequest request) {
+        //String accessToken = userService.getAccessTokenFromKakao(code);
+        String accessToken = request.getHeader(KakaoTokenConst.HEADER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(accessToken);
 
-        HttpSession session = request.getSession();
+        //HttpSession session = request.getSession();
 
-        User user = userService.kakaoLogin(userInfo, session, accessToken);
+        User user = userService.kakaoLogin(userInfo, accessToken);
 
         UserResponseDto userResponseDto = new UserResponseDto(user);
 
-        log.info(session.getId());
+        //log.info(session.getId());
 
         return ResponseEntity
                 .status(HttpStatus.MOVED_PERMANENTLY)
-                .location(URI.create("https://www.nemoz.one/auth/kakao?session="+session.getId()))
+                .location(URI.create("https://www.nemoz.one/auth/kakao"))
                 .build();
     }
 
@@ -124,8 +126,8 @@ public class UserController {
     public ResponseEntity<?> join(
             HttpServletRequest request,
             @RequestBody UserJoinRequestDto userJoinRequestDto ) {
-
-        KakaoUserInfoResponseDto userInfoResponseDto = (KakaoUserInfoResponseDto) request.getSession(false).getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfoResponseDto = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
+        //KakaoUserInfoResponseDto userInfoResponseDto = (KakaoUserInfoResponseDto) request.getSession(false).getAttribute(SessionConst.LOGIN_MEMBER);
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfoResponseDto.id);
 
         if (optionalUser.isEmpty())
@@ -165,8 +167,9 @@ public class UserController {
     )
     @Operation(summary = "나의 정보", description = "로그인한 사용자의 정보 조회")
     public ResponseEntity<?> getMyInfo(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        //HttpSession session = request.getSession();
+        //KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
         User user = optionalUser.get();
         UserResponseDto userResponseDto = new UserResponseDto(user);

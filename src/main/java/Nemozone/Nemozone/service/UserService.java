@@ -6,6 +6,7 @@ import Nemozone.Nemozone.dto.KakaoUserJoinDto;
 import Nemozone.Nemozone.dto.UserJoinDto;
 import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.repository.UserRepository;
+import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.SessionConst;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import jakarta.servlet.http.HttpServletRequest;
@@ -90,7 +91,7 @@ public class UserService {
         return userInfo;
     }
 
-    public User kakaoLogin(KakaoUserInfoResponseDto userInfo, HttpSession session, String kakaoAccessToken) {
+    public User kakaoLogin(KakaoUserInfoResponseDto userInfo, String kakaoAccessToken) {
         Long kakaoUserId = userInfo.id;
         String nickname = userInfo.kakaoAccount.profile.nickName;
 
@@ -104,8 +105,8 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        session.setAttribute(SessionConst.LOGIN_MEMBER, userInfo);
-        session.setAttribute(SessionConst.KAKAO_ACCESS_TOKEN, kakaoAccessToken);
+//        session.setAttribute(SessionConst.LOGIN_MEMBER, userInfo);
+//        session.setAttribute(SessionConst.KAKAO_ACCESS_TOKEN, kakaoAccessToken);
 
         return user;
     }
@@ -119,14 +120,15 @@ public class UserService {
     }
 
     public void logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
+        //HttpSession session = request.getSession(false);
 
         WebClient.create(KAUTH_TOKEN_URL_HOST).post()
                 .uri(uriBuilder -> uriBuilder
                         .scheme("https")
                         .path("/v1/user/logout")
                         .build(true))
-                .header("Authorization", (String) session.getAttribute(SessionConst.KAKAO_ACCESS_TOKEN))
+                //.header("Authorization", (String) session.getAttribute(SessionConst.KAKAO_ACCESS_TOKEN))
+                .header("Authorization", request.getHeader(KakaoTokenConst.HEADER))
                 .retrieve()
                 //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
@@ -134,7 +136,7 @@ public class UserService {
                 .bodyToMono(KakaoTokenResponseDto.class)
                 .block();
 
-        session.invalidate();
+        //session.invalidate();
     }
 
     public Long makeNewConnectId() {
