@@ -94,8 +94,7 @@ public class UserController {
         //log.info(session.getId());
 
         return ResponseEntity
-                .status(HttpStatus.MOVED_PERMANENTLY)
-                .location(URI.create("https://www.nemoz.one/auth/kakao"))
+                .status(HttpStatus.OK)
                 .build();
     }
 
