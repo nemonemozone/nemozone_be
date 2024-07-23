@@ -85,8 +85,8 @@ public class UserService {
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
 
-        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
-        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
+//        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
+//        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
 
         return userInfo;
     }
