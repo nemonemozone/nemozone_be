@@ -185,7 +185,7 @@ public class UserService {
                         .path("/v1/user/unlink")
                         .build(true))
                 //.header("Authorization", (String) session.getAttribute(SessionConst.KAKAO_ACCESS_TOKEN))
-                .header("Authorization", accessToken)
+                .header("Authorization", "Bearer " + accessToken)
                 .retrieve()
                 //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
