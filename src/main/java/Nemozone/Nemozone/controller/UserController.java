@@ -155,6 +155,16 @@ public class UserController {
                 .body(userResponseDto);
     }
 
+    @GetMapping("/delete-account")
+    public ResponseEntity<?> deleteAccount(HttpServletRequest request) {
+        String accessToken = request.getHeader(KakaoTokenConst.HEADER);
+        KakaoUserInfoResponseDto userInfo = userService.getUserInfo(accessToken);
+        userService.deleteUserByKakaoId(accessToken, userInfo.getId());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .build();
+    }
+
     @GetMapping("/my-info")
     @ApiResponse(responseCode = "200",
             description = "조회 성공",

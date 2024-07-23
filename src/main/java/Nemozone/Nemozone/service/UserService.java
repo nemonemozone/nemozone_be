@@ -152,4 +152,23 @@ public class UserService {
     public Optional<User> getUserByConnectId(Long partnerConnectId) {
         return userRepository.findUserByRelationConnectId(partnerConnectId);
     }
+
+    public void deleteUserByKakaoId(String accessToken, Long id) {
+        Optional<User> optionalUser = getUserByKakaoId(id);
+        User user = optionalUser.get();
+        WebClient.create(KAUTH_USER_URL_HOST).get()
+                .uri(uriBuilder -> uriBuilder
+                        .scheme("https")
+                        .path("/v1/user/unlink")
+                        .build(true))
+                //.header("Authorization", (String) session.getAttribute(SessionConst.KAKAO_ACCESS_TOKEN))
+                .header("Authorization", accessToken)
+                .retrieve()
+                //TODO : Custom Exception
+                .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
+                .onStatus(HttpStatusCode::is5xxServerError, clientResponse -> Mono.error(new RuntimeException("Internal Server Error")))
+                .bodyToMono(KakaoTokenResponseDto.class)
+                .block();
+        userRepository.delete(user);
+    }
 }
