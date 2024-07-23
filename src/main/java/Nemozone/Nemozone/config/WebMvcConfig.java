@@ -41,8 +41,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOriginPatterns("https://www.nemoz.one")
-                .allowedOriginPatterns("http://localhost:8080")
+                .allowedOriginPatterns("*")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders(KakaoTokenConst.HEADER)
                 .allowCredentials(true);
