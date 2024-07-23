@@ -44,6 +44,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedOriginPatterns("*")
                 .allowedMethods(ALLOWED_METHOD_NAMES.split(","))
                 .allowedHeaders(KakaoTokenConst.HEADER)
+                .allowedHeaders("content-type")
+                .allowedHeaders("*")
                 .allowCredentials(true);
 //                .maxAge(3600);
     }
