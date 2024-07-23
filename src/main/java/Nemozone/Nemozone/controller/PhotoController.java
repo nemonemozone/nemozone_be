@@ -84,7 +84,7 @@ public class PhotoController {
                 )
     })
     @PostMapping("")
-    public ResponseEntity<?> savePhoto(@RequestBody PhotoSaveRequestDto requestDto, HttpServletRequest request) {
+    public ResponseEntity<?> savePhoto(@RequestBody PhotoSaveRequestDto requestDto, HttpServletRequest request) throws Exception {
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
@@ -106,7 +106,7 @@ public class PhotoController {
                         mediaType = "application/json",
                         schema = @Schema(implementation = PhotoResponseDto.class))})
     @GetMapping("/{photo_id}")
-    public ResponseEntity<?> getPhotoById(@PathVariable("photo_id") Long photoId, HttpServletRequest request) {
+    public ResponseEntity<?> getPhotoById(@PathVariable("photo_id") Long photoId, HttpServletRequest request) throws Exception {
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));

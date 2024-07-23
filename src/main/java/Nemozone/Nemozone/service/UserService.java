@@ -8,6 +8,7 @@ import Nemozone.Nemozone.entity.User;
 import Nemozone.Nemozone.repository.UserRepository;
 import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.SessionConst;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -22,6 +23,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.http.HttpStatusCode;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -69,7 +75,7 @@ public class UserService {
         return kakaoTokenResponseDto.getAccessToken();
     }
 
-    public KakaoUserInfoResponseDto getUserInfo(String accessToken) {
+    public KakaoUserInfoResponseDto getUserInfo(String accessToken) throws Exception {
         KakaoUserInfoResponseDto userInfo = WebClient.create(KAUTH_USER_URL_HOST)
                 .get()
                 .uri(uriBuilder -> uriBuilder
@@ -77,7 +83,7 @@ public class UserService {
                         .path("/v2/user/me")
                         .build(true))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken) // access token 인가
-                .header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
+                //.header(HttpHeaders.CONTENT_TYPE, HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED.toString())
                 .retrieve()
                 //TODO : Custom Exception
                 .onStatus(HttpStatusCode::is4xxClientError, clientResponse -> Mono.error(new RuntimeException("Invalid Parameter")))
@@ -85,15 +91,32 @@ public class UserService {
                 .bodyToMono(KakaoUserInfoResponseDto.class)
                 .block();
 
-//        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
-//        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
+//        ObjectMapper objectMapper = new ObjectMapper();
+//        KakaoUserInfoResponseDto userInfo;
+//        try {
+//            HttpClient client = HttpClient.newBuilder().build();
+//            HttpRequest request = HttpRequest.newBuilder()
+//                    .uri(URI.create("https://kapi.kakao.com/v2/user/me"))
+//                    .timeout(Duration.ofSeconds(30))
+//                    //.setHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+//                    .setHeader("Authorization", "Bearer " + accessToken)
+//                    .GET()
+//                    .build();
+//            HttpResponse<String> responseStr = client.send(request, HttpResponse.BodyHandlers.ofString());
+//            userInfo = objectMapper.convertValue(responseStr.body(), KakaoUserInfoResponseDto.class);
+//        } catch (Exception e) {
+//            throw new Exception(e);
+//        }
+
+        log.info("[ Kakao Service ] Auth ID ---> {} ", userInfo.getId());
+        log.info("[ Kakao Service ] NickName ---> {} ", userInfo.getKakaoAccount().getProfile().getNickName());
 
         return userInfo;
     }
 
     public User kakaoLogin(KakaoUserInfoResponseDto userInfo, String kakaoAccessToken) {
         Long kakaoUserId = userInfo.id;
-        String nickname = userInfo.kakaoAccount.profile.nickName;
+        //String nickname = userInfo.kakaoAccount.profile.nickName;
 
         Optional<User> optionalUser = userRepository.findByKakaoId(kakaoUserId);
 

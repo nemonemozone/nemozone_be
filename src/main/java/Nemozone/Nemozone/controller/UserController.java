@@ -61,6 +61,14 @@ public class UserController {
         return "redirect:"+location;
     }
 
+    @GetMapping("/kakao-token")
+    public ResponseEntity<?> getKakaoToken(@RequestParam String code) {
+        String accessTokenFromKakao = userService.getAccessTokenFromKakao(code);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(accessTokenFromKakao);
+    }
+
     @GetMapping("/login/kakao/callback")
     @ApiResponse(responseCode = "200",
             description = "성공. 만약 nickname이 null이면 회원가입 필요",
@@ -72,7 +80,7 @@ public class UserController {
             }
     )
     @Operation(summary = "카카오 로그인 콜백", description = "사용자가 로그인 정보 입력 후 카카오 서버에서 로그인 코드를 담아 콜백")
-    public ResponseEntity<?> KakaoLoginCallback(HttpServletRequest request) {
+    public ResponseEntity<?> KakaoLoginCallback(HttpServletRequest request) throws Exception {
         //String accessToken = userService.getAccessTokenFromKakao(code);
         String accessToken = request.getHeader(KakaoTokenConst.HEADER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(accessToken);
@@ -125,7 +133,7 @@ public class UserController {
             description = "카카오 로그인 결과 json에 null 값이 있다면 회원가입이 되지 않은 것이므로 회원가입 진행")
     public ResponseEntity<?> join(
             HttpServletRequest request,
-            @RequestBody UserJoinRequestDto userJoinRequestDto ) {
+            @RequestBody UserJoinRequestDto userJoinRequestDto ) throws Exception {
         KakaoUserInfoResponseDto userInfoResponseDto = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
         //KakaoUserInfoResponseDto userInfoResponseDto = (KakaoUserInfoResponseDto) request.getSession(false).getAttribute(SessionConst.LOGIN_MEMBER);
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfoResponseDto.id);
@@ -156,7 +164,7 @@ public class UserController {
     }
 
     @GetMapping("/delete-account")
-    public ResponseEntity<?> deleteAccount(HttpServletRequest request) {
+    public ResponseEntity<?> deleteAccount(HttpServletRequest request) throws Exception {
         String accessToken = request.getHeader(KakaoTokenConst.HEADER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(accessToken);
         userService.deleteUserByKakaoId(accessToken, userInfo.getId());
@@ -176,7 +184,7 @@ public class UserController {
             }
     )
     @Operation(summary = "나의 정보", description = "로그인한 사용자의 정보 조회")
-    public ResponseEntity<?> getMyInfo(HttpServletRequest request) {
+    public ResponseEntity<?> getMyInfo(HttpServletRequest request) throws Exception {
         //HttpSession session = request.getSession();
         //KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));

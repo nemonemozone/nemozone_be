@@ -52,7 +52,7 @@ public class RelationController {
     @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
     @Operation(summary = "로그인한 커플의 모든 정보 조회", description = "로그인한 유저가 속한 커플의 모든 정보를 조회합니다.")
     @GetMapping("")
-    public ResponseEntity<?> getRelationInfo(HttpServletRequest request) {
+    public ResponseEntity<?> getRelationInfo(HttpServletRequest request) throws Exception {
         //KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) request.getSession().getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
         Optional<User> optionalUser = userService.getUserByKakaoId(userInfo.getId());
@@ -85,7 +85,7 @@ public class RelationController {
     @PostMapping("")
     public ResponseEntity<?> setRelation (
             @RequestBody RelationSetDto relationSetDto,
-            HttpServletRequest request) {
+            HttpServletRequest request) throws Exception {
 
         Long partnerConnectId = relationSetDto.partnerConnectId();
 //        HttpSession session = request.getSession();
@@ -142,7 +142,7 @@ public class RelationController {
     )
     @ApiResponse(responseCode = "404", description = "파트너 정보가 존재하지 않음")
     @GetMapping("/partner")
-    public ResponseEntity<?> getPartnerInfo(HttpServletRequest request) {
+    public ResponseEntity<?> getPartnerInfo(HttpServletRequest request) throws Exception {
 
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
@@ -175,7 +175,7 @@ public class RelationController {
     )
     @ApiResponse(responseCode = "404", description = "user 엔티티가 존재하지 않음")
     @GetMapping("/date")
-    public ResponseEntity<?> getRelationTotalDate(HttpServletRequest request) {
+    public ResponseEntity<?> getRelationTotalDate(HttpServletRequest request) throws Exception {
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));

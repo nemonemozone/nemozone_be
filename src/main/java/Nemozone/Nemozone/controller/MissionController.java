@@ -53,7 +53,7 @@ public class MissionController {
             }
     )
     @GetMapping("/next")
-    public ResponseEntity<?> getNextMission(HttpServletRequest request) {
+    public ResponseEntity<?> getNextMission(HttpServletRequest request) throws Exception {
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
@@ -95,7 +95,7 @@ public class MissionController {
                 )})
     @ApiResponse(responseCode = "400", description = "커플이 아님")
     @GetMapping("")
-    public ResponseEntity<?> getAllMission(HttpServletRequest request) {
+    public ResponseEntity<?> getAllMission(HttpServletRequest request) throws Exception {
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
@@ -127,7 +127,7 @@ public class MissionController {
     @ApiResponse(responseCode = "400", description = "커플이 아님")
     @ApiResponse(responseCode = "404", description = "정보가 없음")
     @GetMapping("/{mission_id}")
-    public ResponseEntity<?> getMissionById(@PathVariable("mission_id") Long missionId, HttpServletRequest request) {
+    public ResponseEntity<?> getMissionById(@PathVariable("mission_id") Long missionId, HttpServletRequest request) throws Exception {
 //        HttpSession session = request.getSession();
 //        KakaoUserInfoResponseDto userInfo = (KakaoUserInfoResponseDto) session.getAttribute(SessionConst.LOGIN_MEMBER);
         KakaoUserInfoResponseDto userInfo = userService.getUserInfo(request.getHeader(KakaoTokenConst.HEADER));
