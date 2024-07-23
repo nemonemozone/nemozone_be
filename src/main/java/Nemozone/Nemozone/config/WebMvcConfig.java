@@ -1,6 +1,7 @@
 package Nemozone.Nemozone.config;
 
 import Nemozone.Nemozone.service.UserService;
+import Nemozone.Nemozone.session.KakaoTokenConst;
 import Nemozone.Nemozone.session.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -34,6 +35,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
 //                .allowedHeaders("Authorization", "Content-Type")
 //                .exposedHeaders("Custom-Header")
+                .allowedHeaders(KakaoTokenConst.HEADER)
                 .allowCredentials(true);
 //                .maxAge(3600);
     }
